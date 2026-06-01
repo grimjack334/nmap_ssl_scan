@@ -2,6 +2,26 @@
 
 Scans hosts with nmap's `ssl-cert` script and stores results in a local SQLite database. Includes a CGI web UI for browsing and filtering certificates.
 
+## Installation
+
+```bash
+git clone https://github.com/grimjack334/nmap_ssl_scan.git
+cd nmap_ssl_scan
+```
+
+No Python packages to install — stdlib only. Just ensure `nmap` is available:
+
+```bash
+# Debian/Ubuntu
+sudo apt install nmap
+
+# RHEL/Fedora
+sudo dnf install nmap
+
+# macOS
+brew install nmap
+```
+
 ## Requirements
 
 - Python 3.10+
