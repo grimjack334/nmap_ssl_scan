@@ -443,7 +443,9 @@ def main():
     parser.add_argument("--export-json",   metavar="FILE", help="Export all records to JSON")
     parser.add_argument("--limit",         type=int, default=100, help="Max rows returned by --query")
     parser.add_argument("--no-scan",       action="store_true", help="Skip scanning; only query/export")
-    parser.add_argument("--netbox-url",    metavar="URL", help="NetBox base URL (e.g. https://netbox.example.com)")
+    parser.add_argument("--netbox-url",    metavar="URL",
+                        default=os.environ.get("NETBOX_URL"),
+                        help="NetBox base URL (or set NETBOX_URL env var)")
     parser.add_argument("--netbox-token",  metavar="TOKEN",
                         default=os.environ.get("NETBOX_TOKEN"),
                         help="NetBox API token (or set NETBOX_TOKEN env var)")
