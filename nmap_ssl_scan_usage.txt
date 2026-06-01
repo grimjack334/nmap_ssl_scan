@@ -1,0 +1,45 @@
+# Single host
+python3 nmap_ssl_scan.py example.com
+
+# Multiple hosts / CIDR (requires root for SYN scan)
+sudo python3 nmap_ssl_scan.py 192.168.1.0/24 -p 443,8443
+
+# From a file of targets
+python3 nmap_ssl_scan.py targets.txt --db certs.db
+
+# Query stored results
+python3 nmap_ssl_scan.py --query --db certs.db
+
+# Show only expired certs
+python3 nmap_ssl_scan.py --query --expired
+
+# Filter by hostname
+python3 nmap_ssl_scan.py --query --filter example.com
+
+# Export everything to JSON
+python3 nmap_ssl_scan.py --query --export-json output.json
+
+# Pass extra nmap flags (e.g. timing, verbosity)
+python3 nmap_ssl_scan.py example.com --nmap-args "-T4 -v"
+
+Requirements: nmap installed and in $PATH (no extra Python packages needed — stdlib only).
+
+Features
+Scanning
+
+Runs nmap --script ssl-cert,ssl-enum-ciphers against targets
+Supports hosts, IPs, CIDRs, and .txt target lists
+Configurable ports (defaults: 443, 8443, 9443, 4443)
+Parsed & Stored Fields
+
+Subject/Issuer (CN, Org, Country, State, Locality)
+Validity dates + auto-computed days_remaining and is_expired
+Key type & bits, signature algorithm
+Subject Alternative Names (as JSON array)
+SHA-1 / SHA-256 fingerprints
+Full raw nmap output
+Database
+
+Two tables: scans (audit log) and certificates (all cert fields)
+Indexed on host, CN, expiry date
+
