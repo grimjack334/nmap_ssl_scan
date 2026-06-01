@@ -1,0 +1,18 @@
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Scan output
+*.xml
+*.json
+
+# OS
+.DS_Store
