@@ -31,9 +31,13 @@ Default ports: `443, 8443, 9443, 4443`
 Prefixes can be pulled automatically from NetBox instead of (or in addition to) specifying targets manually. Tag any prefixes in NetBox with `nmap_ssl_scan` and they will be included in the scan.
 
 ```bash
-# Token via environment variable (recommended)
+# Via environment variables (recommended)
+export NETBOX_URL=https://netbox.example.com
 export NETBOX_TOKEN=your_token
-python3 nmap_ssl_scan.py --netbox-url https://netbox.example.com
+python3 nmap_ssl_scan.py
+
+# Via CLI flags
+python3 nmap_ssl_scan.py --netbox-url https://netbox.example.com --netbox-token your_token
 
 # Combined with manual targets
 python3 nmap_ssl_scan.py --netbox-url https://netbox.example.com extra-host.com

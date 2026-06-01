@@ -2,12 +2,17 @@
 
 All notable changes to this project will be documented here.
 
+## [Unreleased]
+
+### Added
+- `NETBOX_URL` environment variable fallback for `--netbox-url`
+
 ## [1.1.0] - 2026-06-01
 
 ### Added
 - NetBox integration: fetch scan targets from NetBox prefixes tagged `nmap_ssl_scan`
   - `--netbox-url` and `--netbox-token` CLI flags
-  - Token can be supplied via `NETBOX_TOKEN` environment variable
+  - `NETBOX_TOKEN` environment variable fallback for `--netbox-token`
   - Handles paginated NetBox API responses automatically
   - NetBox prefixes are merged with any manually specified targets
 
