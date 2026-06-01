@@ -20,6 +20,8 @@ import re
 import sqlite3
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
@@ -390,6 +392,34 @@ def export_json(conn: sqlite3.Connection, out_path: str):
     print(f"[+] Exported {len(data)} records to {out_path}")
 
 
+# ── NetBox ────────────────────────────────────────────────────────────────────
+
+def fetch_netbox_prefixes(base_url: str, token: str, tag: str = "nmap_ssl_scan") -> list[str]:
+    """Return all active prefixes from NetBox that carry the given tag."""
+    prefixes = []
+    url = f"{base_url.rstrip('/')}/api/ipam/prefixes/?tag={tag}&status=active&limit=1000"
+
+    while url:
+        req = urllib.request.Request(
+            url,
+            headers={"Authorization": f"Token {token}", "Accept": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+        except urllib.error.HTTPError as e:
+            sys.exit(f"[!] NetBox API error {e.code}: {e.reason}")
+        except urllib.error.URLError as e:
+            sys.exit(f"[!] Could not reach NetBox at {base_url}: {e.reason}")
+
+        for result in data.get("results", []):
+            prefixes.append(result["prefix"])
+
+        url = data.get("next")
+
+    return prefixes
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def load_targets_from_file(path: str) -> list[str]:
@@ -413,6 +443,10 @@ def main():
     parser.add_argument("--export-json",   metavar="FILE", help="Export all records to JSON")
     parser.add_argument("--limit",         type=int, default=100, help="Max rows returned by --query")
     parser.add_argument("--no-scan",       action="store_true", help="Skip scanning; only query/export")
+    parser.add_argument("--netbox-url",    metavar="URL", help="NetBox base URL (e.g. https://netbox.example.com)")
+    parser.add_argument("--netbox-token",  metavar="TOKEN",
+                        default=os.environ.get("NETBOX_TOKEN"),
+                        help="NetBox API token (or set NETBOX_TOKEN env var)")
     args = parser.parse_args()
 
     conn = get_db(args.db)
@@ -430,11 +464,17 @@ def main():
         return
 
     # ── Resolve targets ──
-    if not args.targets:
-        parser.print_help()
-        sys.exit(1)
-
     targets = []
+
+    if args.netbox_url:
+        if not args.netbox_token:
+            sys.exit("[!] --netbox-url requires a token via --netbox-token or NETBOX_TOKEN env var.")
+        nb_prefixes = fetch_netbox_prefixes(args.netbox_url, args.netbox_token)
+        if not nb_prefixes:
+            sys.exit("[!] NetBox returned no prefixes tagged 'nmap_ssl_scan'.")
+        print(f"[*] Loaded {len(nb_prefixes)} prefix(es) from NetBox")
+        targets.extend(nb_prefixes)
+
     for t in args.targets:
         if os.path.isfile(t):
             targets.extend(load_targets_from_file(t))
@@ -443,7 +483,8 @@ def main():
             targets.append(t)
 
     if not targets:
-        sys.exit("[!] No targets specified.")
+        parser.print_help()
+        sys.exit(1)
 
     # ── Scan ──
     extra = args.nmap_args.split() if args.nmap_args else []
