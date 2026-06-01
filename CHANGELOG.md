@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented here.
 
-## [Unreleased]
+## [1.2.0] - 2026-06-01
 
 ### Added
 - `NETBOX_URL` environment variable fallback for `--netbox-url`
