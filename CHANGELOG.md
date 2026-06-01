@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented here.
 
-## [Unreleased]
+## [1.1.0] - 2026-06-01
 
 ### Added
 - NetBox integration: fetch scan targets from NetBox prefixes tagged `nmap_ssl_scan`
