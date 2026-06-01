@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented here.
 
-## [Unreleased]
+## [1.3.0] - 2026-06-01
 
 ### Added
 - Installation section to README with `git clone` and `nmap` install instructions
