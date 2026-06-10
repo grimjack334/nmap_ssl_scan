@@ -83,6 +83,8 @@ python3 nmap_ssl_scan.py --query --export-json output.json
 
 ## Web UI
 
+### SSL Certificate viewer (`ssl_certs.cgi`)
+
 A CGI script provides a browser-based view of the database with filtering, pagination, and per-certificate detail pages.
 
 ```bash
@@ -96,6 +98,22 @@ Override the database path via environment variable:
 ```bash
 SSL_DB_PATH=/path/to/certs.db python3 ssl_certs.cgi
 ```
+
+### NetBox inventory dashboard (`netbox_inventory.cgi`)
+
+A CGI dashboard showing device and VM counts from NetBox, broken down by tenant. Features interactive donut charts with hover tooltips and a per-tenant breakdown table.
+
+```bash
+# Test locally with built-in example data (no NetBox needed)
+python3 -m http.server --cgi 8080
+# Place netbox_inventory.cgi in cgi-bin/ and open:
+# http://localhost:8080/cgi-bin/netbox_inventory.cgi
+
+# Connect to a live NetBox instance
+NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_inventory.cgi
+```
+
+The dashboard falls back to built-in example data with an info banner when `NETBOX_URL` is not set, so it works out of the box for local testing.
 
 ## What gets stored
 
