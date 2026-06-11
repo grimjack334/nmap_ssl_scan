@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented here.
 
+## [1.7.3] - 2026-06-11
+
+### Fixed
+- `netbox_inventory.cgi`: chart tooltip now hides correctly when the cursor moves off a slice or legend item to a non-interactive part of the card
+
 ## [1.7.2] - 2026-06-11
 
 ### Fixed
