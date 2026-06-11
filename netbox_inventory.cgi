@@ -512,6 +512,7 @@ def page_wrap(title: str, body: str) -> str:
     <div class="nav-divider"></div>
     <div class="nav-label">NetBox</div>
     <a href="{SCRIPT_NAME}" class="nav-link active">Inventory Summary</a>
+    <a href="netbox_devices.cgi" class="nav-link">Devices &amp; VMs</a>
   </div>
 </nav>
 <main>
