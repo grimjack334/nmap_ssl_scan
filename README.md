@@ -24,7 +24,7 @@ brew install nmap
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.9+
 - `nmap` installed and in `$PATH`
 - No third-party Python packages — stdlib only
 
