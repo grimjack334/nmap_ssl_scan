@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented here.
 
+## [1.5.0] - 2026-06-11
+
+### Added
+- `netbox_devices.cgi`: sortable, filterable combined list of NetBox devices and VMs
+  - Columns: Name, Type, Tenant, Role, Status, Site
+  - Client-side sort on all columns with ▲▼ indicators
+  - Live filter by free text plus Type, Status, and Tenant dropdowns (options populated from data)
+  - Color-coded status badges (active, offline, staged, planned, decommissioning)
+  - Device / VM type badges
+  - Sidebar link back to `netbox_inventory.cgi`
+  - Falls back to built-in example data when `NETBOX_URL` is not configured
+
 ## [1.4.0] - 2026-06-10
 
 ### Added

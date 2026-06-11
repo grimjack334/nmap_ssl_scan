@@ -115,6 +115,22 @@ NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_inv
 
 The dashboard falls back to built-in example data with an info banner when `NETBOX_URL` is not set, so it works out of the box for local testing.
 
+### NetBox device list (`netbox_devices.cgi`)
+
+A sortable, filterable combined list of all devices and virtual machines from NetBox. Columns: Name, Type, Tenant, Role, Status, Site. All sorting and filtering is client-side with no page reloads.
+
+```bash
+# Test locally with built-in example data (no NetBox needed)
+python3 -m http.server --cgi 8080
+# Place netbox_devices.cgi in cgi-bin/ and open:
+# http://localhost:8080/cgi-bin/netbox_devices.cgi
+
+# Connect to a live NetBox instance
+NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_devices.cgi
+```
+
+Filter controls: free-text search across all columns, plus Type / Status / Tenant dropdowns populated from the live data. Click any column header to sort; click again to reverse.
+
 ## What gets stored
 
 | Field | Description |
