@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented here.
 
+## [1.7.1] - 2026-06-11
+
+### Fixed
+- `netbox_inventory.cgi`: added missing Devices &amp; VMs sidebar link to `netbox_devices.cgi`
+
 ## [1.7.0] - 2026-06-11
 
 ### Added

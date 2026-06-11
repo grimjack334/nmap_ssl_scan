@@ -116,7 +116,7 @@ NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_inv
 NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_inventory.cgi
 ```
 
-Data source priority: `NETBOX_EXPORT_FILE` → live API (`NETBOX_URL` + `NETBOX_TOKEN`) → built-in example data. An info banner identifies which source is active.
+Data source priority: `NETBOX_EXPORT_FILE` → live API (`NETBOX_URL` + `NETBOX_TOKEN`) → built-in example data. An info banner identifies which source is active. The sidebar links to `netbox_devices.cgi`.
 
 ### NetBox device list (`netbox_devices.cgi`)
 
