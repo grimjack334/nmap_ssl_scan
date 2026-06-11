@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented here.
 
+## [1.6.0] - 2026-06-11
+
+### Added
+- `check_nfs_mounts.sh`: Nagios NRPE plugin to audit NFS mount consistency
+  - Compares NFS entries across `/etc/fstab`, `/proc/mounts`, and `nrpe.cfg` `check_disk -p` paths
+  - Parses both `nrpe.cfg` and all `nrpe.d/*.cfg` drop-in files
+  - CRITICAL when a configured mount is not active, or nrpe monitors a non-existent mount
+  - WARNING for unmonitored mounts, ad-hoc mounts missing from fstab, and `noauto` gaps
+  - Treats `noauto` fstab entries as WARNING rather than CRITICAL when unmounted
+  - Outputs Nagios performance data (`nfs_ok`, `nfs_warn`, `nfs_crit`, `nfs_fstab`, `nfs_active`, `nfs_nrpe`)
+  - `-c`, `-d`, `-f` flags to override default config paths; `-v` for verbose OK listing
+
 ## [1.5.0] - 2026-06-11
 
 ### Added
