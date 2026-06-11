@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented here.
 
+## [1.8.2] - 2026-06-11
+
+### Added
+- `netbox_inventory.cgi`: CSV and JSON export buttons on the Breakdown by Tenant and Breakdown by Domain tables
+  - Exports tenant/domain, devices, VMs, and total columns
+  - Downloads as `netbox_tenants.csv/.json` and `netbox_domains.csv/.json`
+
 ## [1.8.1] - 2026-06-11
 
 ### Added
