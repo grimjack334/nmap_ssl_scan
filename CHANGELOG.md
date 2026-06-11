@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented here.
 
+## [1.7.0] - 2026-06-11
+
+### Added
+- `netbox_export.py`: CLI script to export NetBox devices and VMs to a JSON flat file
+  - Fetches `dcim/devices` and `virtualization/virtual-machines` from the NetBox API with pagination
+  - Prunes each record to only the fields required by the CGI viewers
+  - Writes `{ exported_at, source, devices[], virtual_machines[] }` JSON
+  - `--url` / `--token` CLI flags with `NETBOX_URL` / `NETBOX_TOKEN` env-var fallbacks
+  - `--output` to specify the destination file (default: `netbox_export.json`)
+  - `--pretty` for human-readable indented output
+- `netbox_devices.cgi`: `NETBOX_EXPORT_FILE` environment variable support
+  - When set, loads devices and VMs from the export file instead of hitting the live API
+  - Info banner shows the file path and `exported_at` timestamp from the export
+  - Topbar subtitle reflects the active data source (live URL, export file, or example data)
+- `netbox_inventory.cgi`: same `NETBOX_EXPORT_FILE` support as `netbox_devices.cgi`
+
+### Changed
+- Data source priority in both NetBox CGI scripts: export file → live API → example data
+
 ## [1.6.0] - 2026-06-11
 
 ### Added

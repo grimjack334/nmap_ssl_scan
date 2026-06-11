@@ -22,10 +22,11 @@ cgitb.enable()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-NETBOX_URL   = os.environ.get("NETBOX_URL", "").rstrip("/")
-NETBOX_TOKEN = os.environ.get("NETBOX_TOKEN", "")
-WIKI_URL     = os.environ.get("WIKI_URL", "http://localhost:8080/")
-SCRIPT_NAME  = os.environ.get("SCRIPT_NAME", "netbox_inventory.cgi")
+NETBOX_URL         = os.environ.get("NETBOX_URL", "").rstrip("/")
+NETBOX_TOKEN       = os.environ.get("NETBOX_TOKEN", "")
+NETBOX_EXPORT_FILE = os.environ.get("NETBOX_EXPORT_FILE", "")
+WIKI_URL           = os.environ.get("WIKI_URL", "http://localhost:8080/")
+SCRIPT_NAME        = os.environ.get("SCRIPT_NAME", "netbox_inventory.cgi")
 
 CHART_COLORS = [
     "#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6",
@@ -140,6 +141,17 @@ def _fetch_all(endpoint: str) -> list:
 
 def get_inventory() -> tuple:
     """Return (devices, vms, source_label, error_msg|None)."""
+    if NETBOX_EXPORT_FILE:
+        try:
+            with open(NETBOX_EXPORT_FILE) as f:
+                data = json.load(f)
+            devices     = data.get("devices", [])
+            vms         = data.get("virtual_machines", [])
+            exported_at = data.get("exported_at", "")
+            label       = f"export file ({exported_at})" if exported_at else "export file"
+            return devices, vms, label, None
+        except Exception as exc:
+            return EXAMPLE_DEVICES, EXAMPLE_VMS, "example data", f"Export file error: {exc}"
     if NETBOX_URL and NETBOX_TOKEN:
         try:
             devices = _fetch_all("dcim/devices")
@@ -506,7 +518,7 @@ def page_wrap(title: str, body: str) -> str:
   <div class="topbar">
     <button id="menu-btn" aria-label="Toggle menu">&#9776;</button>
     <div class="topbar-title"><strong>NetBox Inventory</strong></div>
-    <div class="topbar-sub">{h(NETBOX_URL or "example data mode")}</div>
+    <div class="topbar-sub">{h(NETBOX_URL or NETBOX_EXPORT_FILE or "example data mode")}</div>
   </div>
   <div class="content-wrap">
     {body}
@@ -531,7 +543,10 @@ def view_summary(rows: list, total_devices: int, total_vms: int,
     alerts = ""
     if error:
         alerts += f'<div class="alert alert-warn">&#9888; {h(error)} &mdash; showing example data.</div>'
-    if source == "example data":
+    if source.startswith("export file"):
+        alerts += (f'<div class="alert alert-info">&#9432; Showing exported data from '
+                   f'<code>{h(NETBOX_EXPORT_FILE)}</code> &mdash; {h(source)}.</div>')
+    elif source == "example data":
         alerts += ('<div class="alert alert-info">&#9432; Showing built-in example data. '
                    'Set <code>NETBOX_URL</code> and <code>NETBOX_TOKEN</code> '
                    'environment variables to connect to a real NetBox instance.</div>')

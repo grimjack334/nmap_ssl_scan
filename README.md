@@ -111,9 +111,12 @@ python3 -m http.server --cgi 8080
 
 # Connect to a live NetBox instance
 NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_inventory.cgi
+
+# Load from a pre-exported flat file instead of the live API
+NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_inventory.cgi
 ```
 
-The dashboard falls back to built-in example data with an info banner when `NETBOX_URL` is not set, so it works out of the box for local testing.
+Data source priority: `NETBOX_EXPORT_FILE` → live API (`NETBOX_URL` + `NETBOX_TOKEN`) → built-in example data. An info banner identifies which source is active.
 
 ### NetBox device list (`netbox_devices.cgi`)
 
@@ -127,9 +130,29 @@ python3 -m http.server --cgi 8080
 
 # Connect to a live NetBox instance
 NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_devices.cgi
+
+# Load from a pre-exported flat file instead of the live API
+NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_devices.cgi
 ```
 
-Filter controls: free-text search across all columns, plus Type / Status / Tenant dropdowns populated from the live data. Click any column header to sort; click again to reverse.
+Filter controls: free-text search across all columns, plus Type / Status / Tenant dropdowns populated from the live data. Click any column header to sort; click again to reverse. Data source priority is the same as `netbox_inventory.cgi`.
+
+### NetBox export (`netbox_export.py`)
+
+Fetches devices and VMs from NetBox and writes a JSON flat file that both CGI viewers can load offline via `NETBOX_EXPORT_FILE`. Useful for environments where the web server has no direct access to NetBox.
+
+```bash
+# Export using CLI flags
+python3 netbox_export.py --url https://netbox.example.com --token your_token
+
+# Export using environment variables
+NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_export.py
+
+# Custom output path and pretty-printed JSON
+python3 netbox_export.py --url ... --token ... --output /var/www/cgi-bin/netbox_export.json --pretty
+```
+
+The output file contains `exported_at` (ISO 8601 UTC timestamp), `source` (NetBox URL), `devices`, and `virtual_machines`. Each record is pruned to the fields the CGI scripts require.
 
 ## Nagios NRPE plugin (`check_nfs_mounts.sh`)
 
