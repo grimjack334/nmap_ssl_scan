@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented here.
 
+## [1.4.0] - 2026-06-10
+
+### Added
+- `netbox_inventory.cgi`: CGI dashboard for NetBox inventory summary
+  - Device and VM counts broken down by tenant
+  - Interactive SVG donut charts with hover tooltips and slice highlighting
+  - Per-tenant breakdown table with share-of-inventory bars and device/VM split bars
+  - Fetches from NetBox `dcim/devices` and `virtualization/virtual-machines` APIs with pagination
+  - Falls back to built-in example data when `NETBOX_URL` is not configured
+  - `NETBOX_URL` and `NETBOX_TOKEN` environment variable configuration
+- Sidebar/topbar layout redesign for `ssl_certs.cgi` (CSS variables, collapsible sidebar, sticky topbar, responsive mobile toggle)
+
 ## [1.3.0] - 2026-06-01
 
 ### Added
