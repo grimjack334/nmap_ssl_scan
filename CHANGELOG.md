@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented here.
 
+## [1.8.1] - 2026-06-11
+
+### Added
+- `netbox_devices.cgi`: Export CSV and Export JSON buttons in the toolbar
+  - Exports only the currently visible (filtered) rows
+  - CSV includes a header line; JSON exports an array of objects
+  - Fields: name, type, tenant, domain, role, status, site
+  - Downloads as `netbox_devices.csv` or `netbox_devices.json`
+
 ## [1.8.0] - 2026-06-11
 
 ### Added

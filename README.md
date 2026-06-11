@@ -139,6 +139,8 @@ NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_devices.cgi
 
 Columns: Name, Type, Tenant, Domain, Role, Status, Site. Filter controls: free-text search across all columns, plus Type, Status, Tenant, and Domain dropdowns populated from the live data. Click any column header to sort; click again to reverse. Domain is read from the `domain` NetBox custom field. Data source priority is the same as `netbox_inventory.cgi`.
 
+Export CSV and Export JSON buttons in the toolbar download the currently visible (filtered) rows as `netbox_devices.csv` or `netbox_devices.json`.
+
 ### NetBox export (`netbox_export.py`)
 
 Fetches devices and VMs from NetBox and writes a JSON flat file that both CGI viewers can load offline via `NETBOX_EXPORT_FILE`. Useful for environments where the web server has no direct access to NetBox.
