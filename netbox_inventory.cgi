@@ -36,51 +36,54 @@ CHART_COLORS = [
 ]
 DEVICE_COLOR = "#6366f1"
 VM_COLOR     = "#22c55e"
-UNASSIGNED   = "(Unassigned)"
+UNASSIGNED        = "(Unassigned)"
+UNASSIGNED_DOMAIN = "(No Domain)"
 
 # ── Example subset ────────────────────────────────────────────────────────────
 
-def _dev(id_, name, tenant, role="Server", site="DC-Primary"):
+def _dev(id_, name, tenant, role="Server", site="DC-Primary", domain=""):
     t = {"id": id_, "name": tenant} if tenant else None
     return {"id": id_, "name": name, "tenant": t,
-            "device_role": {"name": role}, "site": {"name": site}}
+            "device_role": {"name": role}, "site": {"name": site},
+            "custom_fields": {"domain": domain}}
 
-def _vm(id_, name, tenant, role="Application"):
+def _vm(id_, name, tenant, role="Application", domain=""):
     t = {"id": id_, "name": tenant} if tenant else None
-    return {"id": id_, "name": name, "tenant": t, "role": {"name": role}}
+    return {"id": id_, "name": name, "tenant": t, "role": {"name": role},
+            "custom_fields": {"domain": domain}}
 
 
 EXAMPLE_DEVICES = [
     # Infrastructure – 12
-    _dev(1,  "core-sw-01",  "Infrastructure", "Core Switch"),
-    _dev(2,  "core-sw-02",  "Infrastructure", "Core Switch"),
-    _dev(3,  "dist-sw-01",  "Infrastructure", "Distribution Switch"),
-    _dev(4,  "dist-sw-02",  "Infrastructure", "Distribution Switch"),
-    _dev(5,  "dist-sw-03",  "Infrastructure", "Distribution Switch", "DC-Secondary"),
-    _dev(6,  "fw-01",       "Infrastructure", "Firewall"),
-    _dev(7,  "fw-02",       "Infrastructure", "Firewall"),
-    _dev(8,  "edge-rtr-01", "Infrastructure", "Router"),
-    _dev(9,  "edge-rtr-02", "Infrastructure", "Router"),
-    _dev(10, "kvm-host-01", "Infrastructure"),
-    _dev(11, "kvm-host-02", "Infrastructure"),
-    _dev(12, "kvm-host-03", "Infrastructure", "Server", "DC-Secondary"),
+    _dev(1,  "core-sw-01",  "Infrastructure", "Core Switch",                         domain="corp.local"),
+    _dev(2,  "core-sw-02",  "Infrastructure", "Core Switch",                         domain="corp.local"),
+    _dev(3,  "dist-sw-01",  "Infrastructure", "Distribution Switch",                 domain="corp.local"),
+    _dev(4,  "dist-sw-02",  "Infrastructure", "Distribution Switch",                 domain="corp.local"),
+    _dev(5,  "dist-sw-03",  "Infrastructure", "Distribution Switch", "DC-Secondary", domain="corp.local"),
+    _dev(6,  "fw-01",       "Infrastructure", "Firewall",                             domain="corp.local"),
+    _dev(7,  "fw-02",       "Infrastructure", "Firewall",                             domain="corp.local"),
+    _dev(8,  "edge-rtr-01", "Infrastructure", "Router",                               domain="corp.local"),
+    _dev(9,  "edge-rtr-02", "Infrastructure", "Router",                               domain="corp.local"),
+    _dev(10, "kvm-host-01", "Infrastructure",                                         domain="corp.local"),
+    _dev(11, "kvm-host-02", "Infrastructure",                                         domain="corp.local"),
+    _dev(12, "kvm-host-03", "Infrastructure", "Server", "DC-Secondary",              domain="corp.local"),
     # Acme Corp – 7
-    _dev(13, "web-srv-01",  "Acme Corp"),
-    _dev(14, "web-srv-02",  "Acme Corp"),
-    _dev(15, "db-srv-01",   "Acme Corp", "Database Server"),
-    _dev(16, "db-srv-02",   "Acme Corp", "Database Server"),
-    _dev(17, "app-srv-01",  "Acme Corp"),
-    _dev(18, "app-srv-02",  "Acme Corp"),
-    _dev(19, "lb-01",       "Acme Corp", "Load Balancer"),
+    _dev(13, "web-srv-01",  "Acme Corp",                                              domain="acme.local"),
+    _dev(14, "web-srv-02",  "Acme Corp",                                              domain="acme.local"),
+    _dev(15, "db-srv-01",   "Acme Corp",  "Database Server",                         domain="acme.local"),
+    _dev(16, "db-srv-02",   "Acme Corp",  "Database Server",                         domain="acme.local"),
+    _dev(17, "app-srv-01",  "Acme Corp",                                              domain="acme.local"),
+    _dev(18, "app-srv-02",  "Acme Corp",                                              domain="acme.local"),
+    _dev(19, "lb-01",       "Acme Corp",  "Load Balancer",                           domain="acme.local"),
     # Finance Dept – 4
-    _dev(20, "fin-srv-01",  "Finance Dept"),
-    _dev(21, "fin-db-01",   "Finance Dept", "Database Server"),
-    _dev(22, "fin-bkp-01",  "Finance Dept"),
-    _dev(23, "fin-fw-01",   "Finance Dept", "Firewall"),
+    _dev(20, "fin-srv-01",  "Finance Dept",                                           domain="finance.local"),
+    _dev(21, "fin-db-01",   "Finance Dept", "Database Server",                       domain="finance.local"),
+    _dev(22, "fin-bkp-01",  "Finance Dept",                                           domain="finance.local"),
+    _dev(23, "fin-fw-01",   "Finance Dept", "Firewall",                              domain="finance.local"),
     # Operations – 3
-    _dev(24, "ops-srv-01",  "Operations"),
-    _dev(25, "ops-srv-02",  "Operations"),
-    _dev(26, "ops-mon-01",  "Operations"),
+    _dev(24, "ops-srv-01",  "Operations",                                             domain="ops.local"),
+    _dev(25, "ops-srv-02",  "Operations",                                             domain="ops.local"),
+    _dev(26, "ops-mon-01",  "Operations",                                             domain="ops.local"),
     # Unassigned – 2
     _dev(27, "legacy-01",   None),
     _dev(28, "legacy-02",   None),
@@ -88,38 +91,38 @@ EXAMPLE_DEVICES = [
 
 EXAMPLE_VMS = [
     # Infrastructure – 6
-    _vm(1,  "dns-01",          "Infrastructure"),
-    _vm(2,  "dns-02",          "Infrastructure"),
-    _vm(3,  "ntp-01",          "Infrastructure"),
-    _vm(4,  "smtp-relay",      "Infrastructure"),
-    _vm(5,  "proxy-01",        "Infrastructure"),
-    _vm(6,  "bastion-01",      "Infrastructure"),
+    _vm(1,  "dns-01",          "Infrastructure",               domain="corp.local"),
+    _vm(2,  "dns-02",          "Infrastructure",               domain="corp.local"),
+    _vm(3,  "ntp-01",          "Infrastructure",               domain="corp.local"),
+    _vm(4,  "smtp-relay",      "Infrastructure",               domain="corp.local"),
+    _vm(5,  "proxy-01",        "Infrastructure",               domain="corp.local"),
+    _vm(6,  "bastion-01",      "Infrastructure",               domain="corp.local"),
     # Acme Corp – 12
-    _vm(7,  "acme-web-01",     "Acme Corp"),
-    _vm(8,  "acme-web-02",     "Acme Corp"),
-    _vm(9,  "acme-web-03",     "Acme Corp"),
-    _vm(10, "acme-api-01",     "Acme Corp"),
-    _vm(11, "acme-api-02",     "Acme Corp"),
-    _vm(12, "acme-cache-01",   "Acme Corp"),
-    _vm(13, "acme-cache-02",   "Acme Corp"),
-    _vm(14, "acme-worker-01",  "Acme Corp"),
-    _vm(15, "acme-worker-02",  "Acme Corp"),
-    _vm(16, "acme-worker-03",  "Acme Corp"),
-    _vm(17, "acme-db-01",      "Acme Corp", "Database"),
-    _vm(18, "acme-db-replica", "Acme Corp", "Database"),
+    _vm(7,  "acme-web-01",     "Acme Corp",                    domain="acme.local"),
+    _vm(8,  "acme-web-02",     "Acme Corp",                    domain="acme.local"),
+    _vm(9,  "acme-web-03",     "Acme Corp",                    domain="acme.local"),
+    _vm(10, "acme-api-01",     "Acme Corp",                    domain="acme.local"),
+    _vm(11, "acme-api-02",     "Acme Corp",                    domain="acme.local"),
+    _vm(12, "acme-cache-01",   "Acme Corp",                    domain="acme.local"),
+    _vm(13, "acme-cache-02",   "Acme Corp",                    domain="acme.local"),
+    _vm(14, "acme-worker-01",  "Acme Corp",                    domain="acme.local"),
+    _vm(15, "acme-worker-02",  "Acme Corp",                    domain="acme.local"),
+    _vm(16, "acme-worker-03",  "Acme Corp",                    domain="acme.local"),
+    _vm(17, "acme-db-01",      "Acme Corp",  "Database",       domain="acme.local"),
+    _vm(18, "acme-db-replica", "Acme Corp",  "Database",       domain="acme.local"),
     # Finance Dept – 6
-    _vm(19, "fin-erp-01",      "Finance Dept"),
-    _vm(20, "fin-erp-02",      "Finance Dept"),
-    _vm(21, "fin-reporting",   "Finance Dept"),
-    _vm(22, "fin-backup",      "Finance Dept"),
-    _vm(23, "fin-archive",     "Finance Dept"),
-    _vm(24, "fin-dev",         "Finance Dept"),
+    _vm(19, "fin-erp-01",      "Finance Dept",                 domain="finance.local"),
+    _vm(20, "fin-erp-02",      "Finance Dept",                 domain="finance.local"),
+    _vm(21, "fin-reporting",   "Finance Dept",                 domain="finance.local"),
+    _vm(22, "fin-backup",      "Finance Dept",                 domain="finance.local"),
+    _vm(23, "fin-archive",     "Finance Dept",                 domain="finance.local"),
+    _vm(24, "fin-dev",         "Finance Dept",                 domain="finance.local"),
     # Operations – 5
-    _vm(25, "ops-monitoring",  "Operations"),
-    _vm(26, "ops-alerting",    "Operations"),
-    _vm(27, "ops-logging",     "Operations"),
-    _vm(28, "ops-ticket",      "Operations"),
-    _vm(29, "ops-ansible",     "Operations"),
+    _vm(25, "ops-monitoring",  "Operations",                   domain="ops.local"),
+    _vm(26, "ops-alerting",    "Operations",                   domain="ops.local"),
+    _vm(27, "ops-logging",     "Operations",                   domain="ops.local"),
+    _vm(28, "ops-ticket",      "Operations",                   domain="ops.local"),
+    _vm(29, "ops-ansible",     "Operations",                   domain="ops.local"),
     # Unassigned – 3
     _vm(30, "test-vm-01",      None),
     _vm(31, "test-vm-02",      None),
@@ -180,6 +183,22 @@ def group_by_tenant(devices: list, vms: list) -> list:
         for k, v in counts.items()
     ]
     rows.sort(key=lambda r: (r["tenant"] == UNASSIGNED, -r["total"]))
+    return rows
+
+
+def group_by_domain(devices: list, vms: list) -> list:
+    counts: dict = {}
+    for item in devices:
+        d = (item.get("custom_fields") or {}).get("domain") or UNASSIGNED_DOMAIN
+        counts.setdefault(d, [0, 0])[0] += 1
+    for item in vms:
+        d = (item.get("custom_fields") or {}).get("domain") or UNASSIGNED_DOMAIN
+        counts.setdefault(d, [0, 0])[1] += 1
+    rows = [
+        {"domain": k, "devices": v[0], "vms": v[1], "total": v[0] + v[1]}
+        for k, v in counts.items()
+    ]
+    rows.sort(key=lambda r: (r["domain"] == UNASSIGNED_DOMAIN, -r["total"]))
     return rows
 
 # ── SVG donut chart ───────────────────────────────────────────────────────────
@@ -356,7 +375,7 @@ main { flex: 1; margin-left: var(--sidebar-width); min-width: 0; display: flex; 
 .num.ok     { color: var(--ok); }
 .num.accent { color: var(--accent); }
 
-.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .chart-card h3 { font-size: .72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 16px; }
 .chart-body { display: flex; align-items: center; gap: 20px; }
@@ -541,10 +560,11 @@ def page_wrap(title: str, body: str) -> str:
 
 # ── View ──────────────────────────────────────────────────────────────────────
 
-def view_summary(rows: list, total_devices: int, total_vms: int,
+def view_summary(rows: list, domain_rows: list, total_devices: int, total_vms: int,
                  source: str, error: str | None) -> str:
     total   = total_devices + total_vms
     tenants = len(rows)
+    domains = len(domain_rows)
 
     alerts = ""
     if error:
@@ -563,11 +583,16 @@ def view_summary(rows: list, total_devices: int, total_vms: int,
       <div class="stat-card"><div class="num accent">{total_devices:,}</div><div class="lbl">Devices</div></div>
       <div class="stat-card"><div class="num ok">{total_vms:,}</div><div class="lbl">Virtual Machines</div></div>
       <div class="stat-card"><div class="num">{tenants:,}</div><div class="lbl">Tenants</div></div>
+      <div class="stat-card"><div class="num">{domains:,}</div><div class="lbl">Domains</div></div>
     </div>"""
 
     tenant_slices = [
         (r["tenant"], r["total"], CHART_COLORS[i % len(CHART_COLORS)])
         for i, r in enumerate(rows)
+    ]
+    domain_slices = [
+        (r["domain"], r["total"], CHART_COLORS[i % len(CHART_COLORS)])
+        for i, r in enumerate(domain_rows)
     ]
     type_slices = [
         ("Devices",          total_devices, DEVICE_COLOR),
@@ -577,6 +602,7 @@ def view_summary(rows: list, total_devices: int, total_vms: int,
     charts_html = f"""
     <div class="charts-row">
       {_chart_card("Inventory by Tenant", tenant_slices, "items")}
+      {_chart_card("Inventory by Domain", domain_slices, "items")}
       {_chart_card("Devices vs Virtual Machines", type_slices, "items")}
     </div>"""
 
@@ -633,14 +659,68 @@ def view_summary(rows: list, total_devices: int, total_vms: int,
       </table>
     </div>"""
 
-    return alerts + stats_html + charts_html + table_html
+    if not domain_rows:
+        domain_table_html = ""
+    else:
+        domain_rows_html = []
+        for i, r in enumerate(domain_rows):
+            color   = CHART_COLORS[i % len(CHART_COLORS)]
+            pct     = r["total"] / total * 100 if total else 0
+            dev_pct = r["devices"] / r["total"] * 100 if r["total"] else 0
+            vm_pct  = r["vms"]     / r["total"] * 100 if r["total"] else 0
+            domain_rows_html.append(f"""
+        <tr>
+          <td class="mono">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;
+                         background:{color};margin-right:8px;vertical-align:middle"></span>
+            {h(r["domain"])}
+          </td>
+          <td style="text-align:right">{r["devices"]:,}</td>
+          <td style="text-align:right">{r["vms"]:,}</td>
+          <td style="text-align:right"><strong>{r["total"]:,}</strong></td>
+          <td style="min-width:110px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;background:var(--border);border-radius:3px;height:5px;overflow:hidden">
+                <div style="width:{min(100,pct):.1f}%;background:{color};height:100%"></div>
+              </div>
+              <span style="color:var(--text-muted);font-size:.8rem;min-width:3.2em;text-align:right">{pct:.1f}%</span>
+            </div>
+          </td>
+          <td style="min-width:120px">
+            <div style="display:flex;border-radius:3px;overflow:hidden;height:6px" title="Devices {dev_pct:.0f}% / VMs {vm_pct:.0f}%">
+              <div style="width:{dev_pct:.1f}%;background:{DEVICE_COLOR}"></div>
+              <div style="width:{vm_pct:.1f}%;background:{VM_COLOR}"></div>
+            </div>
+          </td>
+        </tr>""")
+
+        domain_table_html = f"""
+    <div class="detail-card" style="margin-top:16px">
+      <h3>Breakdown by Domain</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th style="text-align:right">Devices</th>
+            <th style="text-align:right">VMs</th>
+            <th style="text-align:right">Total</th>
+            <th>Share of Inventory</th>
+            <th title="Indigo = devices, green = VMs">Device / VM Split</th>
+          </tr>
+        </thead>
+        <tbody>{"".join(domain_rows_html)}</tbody>
+      </table>
+    </div>"""
+
+    return alerts + stats_html + charts_html + table_html + domain_table_html
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     devices, vms, source, error = get_inventory()
-    rows = group_by_tenant(devices, vms)
-    body = view_summary(rows, len(devices), len(vms), source, error)
+    tenant_rows = group_by_tenant(devices, vms)
+    domain_rows = group_by_domain(devices, vms)
+    body = view_summary(tenant_rows, domain_rows, len(devices), len(vms), source, error)
     print(page_wrap("Inventory Summary", body))
 
 

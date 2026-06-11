@@ -43,50 +43,52 @@ DASH = '<span class="muted">—</span>'
 
 # ── Example subset ────────────────────────────────────────────────────────────
 
-def _dev(id_, name, tenant, role="Server", site="DC-Primary", status="active"):
+def _dev(id_, name, tenant, role="Server", site="DC-Primary", status="active", domain=""):
     t = {"id": id_, "name": tenant} if tenant else None
     s = {"value": status, "label": status.replace("-", " ").title()}
     return {"id": id_, "name": name, "tenant": t,
-            "device_role": {"name": role}, "site": {"name": site}, "status": s}
+            "device_role": {"name": role}, "site": {"name": site}, "status": s,
+            "custom_fields": {"domain": domain}}
 
-def _vm(id_, name, tenant, role="Application", status="active", site=None):
+def _vm(id_, name, tenant, role="Application", status="active", site=None, domain=""):
     t = {"id": id_, "name": tenant} if tenant else None
     s = {"value": status, "label": status.replace("-", " ").title()}
     return {"id": id_, "name": name, "tenant": t,
-            "role": {"name": role}, "site": {"name": site} if site else None, "status": s}
+            "role": {"name": role}, "site": {"name": site} if site else None, "status": s,
+            "custom_fields": {"domain": domain}}
 
 
 EXAMPLE_DEVICES = [
     # Infrastructure – 12
-    _dev(1,  "core-sw-01",  "Infrastructure", "Core Switch"),
-    _dev(2,  "core-sw-02",  "Infrastructure", "Core Switch"),
-    _dev(3,  "dist-sw-01",  "Infrastructure", "Distribution Switch"),
-    _dev(4,  "dist-sw-02",  "Infrastructure", "Distribution Switch"),
-    _dev(5,  "dist-sw-03",  "Infrastructure", "Distribution Switch", "DC-Secondary"),
-    _dev(6,  "fw-01",       "Infrastructure", "Firewall"),
-    _dev(7,  "fw-02",       "Infrastructure", "Firewall"),
-    _dev(8,  "edge-rtr-01", "Infrastructure", "Router"),
-    _dev(9,  "edge-rtr-02", "Infrastructure", "Router"),
-    _dev(10, "kvm-host-01", "Infrastructure"),
-    _dev(11, "kvm-host-02", "Infrastructure"),
-    _dev(12, "kvm-host-03", "Infrastructure", "Server", "DC-Secondary", "staged"),
+    _dev(1,  "core-sw-01",  "Infrastructure", "Core Switch",                                   domain="corp.local"),
+    _dev(2,  "core-sw-02",  "Infrastructure", "Core Switch",                                   domain="corp.local"),
+    _dev(3,  "dist-sw-01",  "Infrastructure", "Distribution Switch",                           domain="corp.local"),
+    _dev(4,  "dist-sw-02",  "Infrastructure", "Distribution Switch",                           domain="corp.local"),
+    _dev(5,  "dist-sw-03",  "Infrastructure", "Distribution Switch", "DC-Secondary",           domain="corp.local"),
+    _dev(6,  "fw-01",       "Infrastructure", "Firewall",                                      domain="corp.local"),
+    _dev(7,  "fw-02",       "Infrastructure", "Firewall",                                      domain="corp.local"),
+    _dev(8,  "edge-rtr-01", "Infrastructure", "Router",                                        domain="corp.local"),
+    _dev(9,  "edge-rtr-02", "Infrastructure", "Router",                                        domain="corp.local"),
+    _dev(10, "kvm-host-01", "Infrastructure",                                                  domain="corp.local"),
+    _dev(11, "kvm-host-02", "Infrastructure",                                                  domain="corp.local"),
+    _dev(12, "kvm-host-03", "Infrastructure", "Server", "DC-Secondary", "staged",             domain="corp.local"),
     # Acme Corp – 7
-    _dev(13, "web-srv-01",  "Acme Corp"),
-    _dev(14, "web-srv-02",  "Acme Corp"),
-    _dev(15, "db-srv-01",   "Acme Corp", "Database Server"),
-    _dev(16, "db-srv-02",   "Acme Corp", "Database Server", status="offline"),
-    _dev(17, "app-srv-01",  "Acme Corp"),
-    _dev(18, "app-srv-02",  "Acme Corp"),
-    _dev(19, "lb-01",       "Acme Corp", "Load Balancer"),
+    _dev(13, "web-srv-01",  "Acme Corp",                                                       domain="acme.local"),
+    _dev(14, "web-srv-02",  "Acme Corp",                                                       domain="acme.local"),
+    _dev(15, "db-srv-01",   "Acme Corp",  "Database Server",                                  domain="acme.local"),
+    _dev(16, "db-srv-02",   "Acme Corp",  "Database Server", status="offline",                domain="acme.local"),
+    _dev(17, "app-srv-01",  "Acme Corp",                                                       domain="acme.local"),
+    _dev(18, "app-srv-02",  "Acme Corp",                                                       domain="acme.local"),
+    _dev(19, "lb-01",       "Acme Corp",  "Load Balancer",                                    domain="acme.local"),
     # Finance Dept – 4
-    _dev(20, "fin-srv-01",  "Finance Dept"),
-    _dev(21, "fin-db-01",   "Finance Dept", "Database Server"),
-    _dev(22, "fin-bkp-01",  "Finance Dept"),
-    _dev(23, "fin-fw-01",   "Finance Dept", "Firewall"),
+    _dev(20, "fin-srv-01",  "Finance Dept",                                                    domain="finance.local"),
+    _dev(21, "fin-db-01",   "Finance Dept", "Database Server",                                domain="finance.local"),
+    _dev(22, "fin-bkp-01",  "Finance Dept",                                                    domain="finance.local"),
+    _dev(23, "fin-fw-01",   "Finance Dept", "Firewall",                                       domain="finance.local"),
     # Operations – 3
-    _dev(24, "ops-srv-01",  "Operations"),
-    _dev(25, "ops-srv-02",  "Operations"),
-    _dev(26, "ops-mon-01",  "Operations", status="planned"),
+    _dev(24, "ops-srv-01",  "Operations",                                                      domain="ops.local"),
+    _dev(25, "ops-srv-02",  "Operations",                                                      domain="ops.local"),
+    _dev(26, "ops-mon-01",  "Operations", status="planned",                                   domain="ops.local"),
     # Unassigned – 2
     _dev(27, "legacy-01",   None, status="decommissioning"),
     _dev(28, "legacy-02",   None),
@@ -94,38 +96,38 @@ EXAMPLE_DEVICES = [
 
 EXAMPLE_VMS = [
     # Infrastructure – 6
-    _vm(1,  "dns-01",          "Infrastructure", site="DC-Primary"),
-    _vm(2,  "dns-02",          "Infrastructure", site="DC-Secondary"),
-    _vm(3,  "ntp-01",          "Infrastructure"),
-    _vm(4,  "smtp-relay",      "Infrastructure"),
-    _vm(5,  "proxy-01",        "Infrastructure"),
-    _vm(6,  "bastion-01",      "Infrastructure", site="DC-Primary"),
+    _vm(1,  "dns-01",          "Infrastructure", site="DC-Primary",                           domain="corp.local"),
+    _vm(2,  "dns-02",          "Infrastructure", site="DC-Secondary",                         domain="corp.local"),
+    _vm(3,  "ntp-01",          "Infrastructure",                                               domain="corp.local"),
+    _vm(4,  "smtp-relay",      "Infrastructure",                                               domain="corp.local"),
+    _vm(5,  "proxy-01",        "Infrastructure",                                               domain="corp.local"),
+    _vm(6,  "bastion-01",      "Infrastructure", site="DC-Primary",                           domain="corp.local"),
     # Acme Corp – 12
-    _vm(7,  "acme-web-01",     "Acme Corp"),
-    _vm(8,  "acme-web-02",     "Acme Corp"),
-    _vm(9,  "acme-web-03",     "Acme Corp",  status="staged"),
-    _vm(10, "acme-api-01",     "Acme Corp"),
-    _vm(11, "acme-api-02",     "Acme Corp"),
-    _vm(12, "acme-cache-01",   "Acme Corp"),
-    _vm(13, "acme-cache-02",   "Acme Corp"),
-    _vm(14, "acme-worker-01",  "Acme Corp"),
-    _vm(15, "acme-worker-02",  "Acme Corp"),
-    _vm(16, "acme-worker-03",  "Acme Corp",  status="planned"),
-    _vm(17, "acme-db-01",      "Acme Corp",  "Database"),
-    _vm(18, "acme-db-replica", "Acme Corp",  "Database"),
+    _vm(7,  "acme-web-01",     "Acme Corp",                                                    domain="acme.local"),
+    _vm(8,  "acme-web-02",     "Acme Corp",                                                    domain="acme.local"),
+    _vm(9,  "acme-web-03",     "Acme Corp",  status="staged",                                 domain="acme.local"),
+    _vm(10, "acme-api-01",     "Acme Corp",                                                    domain="acme.local"),
+    _vm(11, "acme-api-02",     "Acme Corp",                                                    domain="acme.local"),
+    _vm(12, "acme-cache-01",   "Acme Corp",                                                    domain="acme.local"),
+    _vm(13, "acme-cache-02",   "Acme Corp",                                                    domain="acme.local"),
+    _vm(14, "acme-worker-01",  "Acme Corp",                                                    domain="acme.local"),
+    _vm(15, "acme-worker-02",  "Acme Corp",                                                    domain="acme.local"),
+    _vm(16, "acme-worker-03",  "Acme Corp",  status="planned",                                domain="acme.local"),
+    _vm(17, "acme-db-01",      "Acme Corp",  "Database",                                      domain="acme.local"),
+    _vm(18, "acme-db-replica", "Acme Corp",  "Database",                                      domain="acme.local"),
     # Finance Dept – 6
-    _vm(19, "fin-erp-01",      "Finance Dept"),
-    _vm(20, "fin-erp-02",      "Finance Dept"),
-    _vm(21, "fin-reporting",   "Finance Dept"),
-    _vm(22, "fin-backup",      "Finance Dept"),
-    _vm(23, "fin-archive",     "Finance Dept"),
-    _vm(24, "fin-dev",         "Finance Dept", status="staged"),
+    _vm(19, "fin-erp-01",      "Finance Dept",                                                 domain="finance.local"),
+    _vm(20, "fin-erp-02",      "Finance Dept",                                                 domain="finance.local"),
+    _vm(21, "fin-reporting",   "Finance Dept",                                                 domain="finance.local"),
+    _vm(22, "fin-backup",      "Finance Dept",                                                 domain="finance.local"),
+    _vm(23, "fin-archive",     "Finance Dept",                                                 domain="finance.local"),
+    _vm(24, "fin-dev",         "Finance Dept", status="staged",                               domain="finance.local"),
     # Operations – 5
-    _vm(25, "ops-monitoring",  "Operations"),
-    _vm(26, "ops-alerting",    "Operations"),
-    _vm(27, "ops-logging",     "Operations"),
-    _vm(28, "ops-ticket",      "Operations"),
-    _vm(29, "ops-ansible",     "Operations"),
+    _vm(25, "ops-monitoring",  "Operations",                                                   domain="ops.local"),
+    _vm(26, "ops-alerting",    "Operations",                                                   domain="ops.local"),
+    _vm(27, "ops-logging",     "Operations",                                                   domain="ops.local"),
+    _vm(28, "ops-ticket",      "Operations",                                                   domain="ops.local"),
+    _vm(29, "ops-ansible",     "Operations",                                                   domain="ops.local"),
     # Unassigned – 3
     _vm(30, "test-vm-01",      None),
     _vm(31, "test-vm-02",      None),
@@ -193,12 +195,14 @@ def normalize(item: dict, kind: str) -> dict:
         site = (item.get("site") or {}).get("name") or ""
         if not site:
             site = ((item.get("cluster") or {}).get("site") or {}).get("name") or ""
+    domain = (item.get("custom_fields") or {}).get("domain") or ""
     status_val, status_label = _parse_status(item)
     return {
         "name":         item.get("name") or "",
         "kind":         kind,
         "tenant":       tenant,
         "role":         role,
+        "domain":       domain,
         "status_val":   status_val,
         "status_label": status_label,
         "site":         site,
@@ -366,6 +370,7 @@ def page_wrap(title: str, body: str) -> str:
   var fType   = document.getElementById('f-type');
   var fStatus = document.getElementById('f-status');
   var fTenant = document.getElementById('f-tenant');
+  var fDomain = document.getElementById('f-domain');
   var sortCol = 'name';
   var sortDir = 'asc';
 
@@ -380,12 +385,14 @@ def page_wrap(title: str, body: str) -> str:
     var type   = fType   ? fType.value   : '';
     var status = fStatus ? fStatus.value : '';
     var tenant = fTenant ? fTenant.value : '';
+    var domain = fDomain ? fDomain.value : '';
     rows.forEach(function(row){
       var show = true;
       if(text   && !row.textContent.toLowerCase().includes(text)) show = false;
       if(type   && row.dataset.kind   !== type)   show = false;
       if(status && row.dataset.status !== status) show = false;
       if(tenant && row.dataset.tenant !== tenant) show = false;
+      if(domain && row.dataset.domain !== domain) show = false;
       row.style.display = show ? '' : 'none';
     });
     updateCount();
@@ -408,7 +415,7 @@ def page_wrap(title: str, body: str) -> str:
     applyFilters();
   }
 
-  [fText, fType, fStatus, fTenant].forEach(function(el){
+  [fText, fType, fStatus, fTenant, fDomain].forEach(function(el){
     if(el) el.addEventListener('input', applyFilters);
   });
 
@@ -423,6 +430,7 @@ def page_wrap(title: str, body: str) -> str:
       if(fType)   fType.value   = '';
       if(fStatus) fStatus.value = '';
       if(fTenant) fTenant.value = '';
+      if(fDomain) fDomain.value = '';
       applyFilters();
     });
   }
@@ -502,11 +510,15 @@ def view_list(items: list, source: str, error: str | None) -> str:
     </div>"""
 
     tenants  = sorted(set(r["tenant"] for r in items if r["tenant"]))
+    domains  = sorted(set(r["domain"] for r in items if r["domain"]))
     statuses = sorted(set((r["status_val"], r["status_label"]) for r in items),
                       key=lambda x: x[0])
 
     tenant_opts = '<option value="">All Tenants</option>' + "".join(
         f'<option value="{h(t)}">{h(t)}</option>' for t in tenants
+    )
+    domain_opts = '<option value="">All Domains</option>' + "".join(
+        f'<option value="{h(d)}">{h(d)}</option>' for d in domains
     )
     status_opts = '<option value="">All Statuses</option>' + "".join(
         f'<option value="{h(v)}">{h(l)}</option>' for v, l in statuses
@@ -522,6 +534,7 @@ def view_list(items: list, source: str, error: str | None) -> str:
       </select>
       <select id="f-status">{status_opts}</select>
       <select id="f-tenant">{tenant_opts}</select>
+      <select id="f-domain">{domain_opts}</select>
       <button id="f-reset" class="btn secondary">Reset</button>
       <span id="row-count" class="row-count"></span>
     </div>"""
@@ -533,11 +546,13 @@ def view_list(items: list, source: str, error: str | None) -> str:
     for r in items:
         rows_html.append(
             f'<tr data-name="{h(r["name"])}" data-kind="{h(r["kind"])}" '
-            f'data-tenant="{h(r["tenant"])}" data-role="{h(r["role"])}" '
+            f'data-tenant="{h(r["tenant"])}" data-domain="{h(r["domain"])}" '
+            f'data-role="{h(r["role"])}" '
             f'data-status="{h(r["status_val"])}" data-site="{h(r["site"])}">'
             f'<td class="mono">{h(r["name"])}</td>'
             f'<td>{type_badge(r["kind"])}</td>'
             f'<td>{h(r["tenant"]) or DASH}</td>'
+            f'<td class="mono">{h(r["domain"]) or DASH}</td>'
             f'<td>{h(r["role"])   or DASH}</td>'
             f'<td>{status_badge(r["status_val"], r["status_label"])}</td>'
             f'<td>{h(r["site"])   or DASH}</td>'
@@ -551,6 +566,7 @@ def view_list(items: list, source: str, error: str | None) -> str:
           <th data-col="name">Name<span class="sort-ind"> &#x2195;</span></th>
           <th data-col="kind">Type<span class="sort-ind"> &#x2195;</span></th>
           <th data-col="tenant">Tenant<span class="sort-ind"> &#x2195;</span></th>
+          <th data-col="domain">Domain<span class="sort-ind"> &#x2195;</span></th>
           <th data-col="role">Role<span class="sort-ind"> &#x2195;</span></th>
           <th data-col="status">Status<span class="sort-ind"> &#x2195;</span></th>
           <th data-col="site">Site<span class="sort-ind"> &#x2195;</span></th>

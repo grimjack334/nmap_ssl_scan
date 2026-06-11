@@ -61,12 +61,14 @@ def _prune_device(d: dict) -> dict:
     tenant = d.get("tenant")
     site   = d.get("site")
     role   = d.get("device_role")
+    domain = (d.get("custom_fields") or {}).get("domain") or ""
     return {
-        "name":        d.get("name", ""),
-        "tenant":      {"name": (tenant or {}).get("name", "")} if tenant else None,
-        "device_role": {"name": (role   or {}).get("name", "")},
-        "site":        {"name": (site   or {}).get("name", "")} if site else None,
-        "status":      _status(d),
+        "name":          d.get("name", ""),
+        "tenant":        {"name": (tenant or {}).get("name", "")} if tenant else None,
+        "device_role":   {"name": (role   or {}).get("name", "")},
+        "site":          {"name": (site   or {}).get("name", "")} if site else None,
+        "status":        _status(d),
+        "custom_fields": {"domain": domain},
     }
 
 
@@ -76,13 +78,15 @@ def _prune_vm(v: dict) -> dict:
     role         = v.get("role")
     cluster      = v.get("cluster")
     cluster_site = ((cluster or {}).get("site") or {}).get("name", "") if cluster else ""
+    domain       = (v.get("custom_fields") or {}).get("domain") or ""
     return {
-        "name":    v.get("name", ""),
-        "tenant":  {"name": (tenant or {}).get("name", "")} if tenant else None,
-        "role":    {"name": (role   or {}).get("name", "")} if role   else None,
-        "site":    {"name": (site   or {}).get("name", "")} if site   else None,
-        "cluster": {"site": {"name": cluster_site}}         if cluster_site else None,
-        "status":  _status(v),
+        "name":          v.get("name", ""),
+        "tenant":        {"name": (tenant or {}).get("name", "")} if tenant else None,
+        "role":          {"name": (role   or {}).get("name", "")} if role   else None,
+        "site":          {"name": (site   or {}).get("name", "")} if site   else None,
+        "cluster":       {"site": {"name": cluster_site}}         if cluster_site else None,
+        "status":        _status(v),
+        "custom_fields": {"domain": domain},
     }
 
 # ── Main ──────────────────────────────────────────────────────────────────────
