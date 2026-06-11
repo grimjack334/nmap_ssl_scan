@@ -131,6 +131,65 @@ NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_dev
 
 Filter controls: free-text search across all columns, plus Type / Status / Tenant dropdowns populated from the live data. Click any column header to sort; click again to reverse.
 
+## Nagios NRPE plugin (`check_nfs_mounts.sh`)
+
+A Nagios/NRPE plugin that audits NFS mount consistency across three sources and reports mismatches as `WARNING` or `CRITICAL`.
+
+**Sources compared:**
+
+| Source | Meaning |
+|---|---|
+| `/etc/fstab` | Mounts that *should* be present |
+| `/proc/mounts` | Mounts that *are* currently active |
+| `nrpe.cfg` `check_disk -p` | Mounts that are being *monitored* |
+
+**Severity matrix:**
+
+| fstab | mounted | nrpe | Result |
+|---|---|---|---|
+| ✓ | ✓ | ✓ | OK |
+| ✓ | ✗ | — | CRITICAL — fstab entry not mounted (`noauto` → WARNING) |
+| ✓ | ✗ | ✓ | CRITICAL — configured everywhere but not mounted |
+| ✗ | ✗ | ✓ | CRITICAL — nrpe monitoring a non-existent mount |
+| ✓ | ✓ | ✗ | WARNING — mounted but not monitored |
+| ✗ | ✓ | ✗ | WARNING — ad-hoc mount, not in fstab, not monitored |
+| ✗ | ✓ | ✓ | WARNING — monitored but missing from fstab (won't survive reboot) |
+
+### Installation
+
+```bash
+cp check_nfs_mounts.sh /usr/lib/nagios/plugins/check_nfs_mounts
+
+# Add to /etc/nagios/nrpe.cfg
+command[check_nfs_mounts]=/usr/lib/nagios/plugins/check_nfs_mounts
+
+# Non-default paths
+command[check_nfs_mounts]=/usr/lib/nagios/plugins/check_nfs_mounts \
+  -c /etc/nagios/nrpe.cfg -d /etc/nagios/nrpe.d
+```
+
+### Options
+
+```
+-c FILE   Path to nrpe.cfg          (default: /etc/nagios/nrpe.cfg)
+-d DIR    Path to nrpe.d directory  (default: /etc/nagios/nrpe.d)
+-f FILE   Path to fstab             (default: /etc/fstab)
+-v        Verbose: also list OK mounts
+-h        Show help
+```
+
+Both `nrpe.cfg` and `nrpe.d/*.cfg` are parsed. Either can be absent — the plugin reads whichever exist.
+
+### Example output
+
+```
+NFS_MOUNTS CRITICAL: 2 OK, 1 warning(s), 1 critical(s) | nfs_ok=2 nfs_warn=1 nfs_crit=1 nfs_fstab=3 nfs_active=3 nfs_nrpe=2
+CRITICAL: /mnt/backup: fstab entry + nrpe check_disk [check_disk_backup] but NOT mounted
+WARNING:  /mnt/archive: mounted per fstab but missing from nrpe check_disk
+```
+
+Performance data (`nfs_ok`, `nfs_warn`, `nfs_crit`, `nfs_fstab`, `nfs_active`, `nfs_nrpe`) can be graphed by Nagios/PNP4Nagios.
+
 ## What gets stored
 
 | Field | Description |
