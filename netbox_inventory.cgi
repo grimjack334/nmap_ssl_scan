@@ -10,6 +10,8 @@ Usage:
     # Open http://localhost:8080/cgi-bin/netbox_inventory.cgi
 """
 
+from __future__ import annotations
+
 import cgitb
 import html as _html
 import json

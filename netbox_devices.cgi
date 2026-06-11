@@ -10,6 +10,8 @@ Connect to NetBox:
     NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=xxx python3 netbox_devices.cgi
 """
 
+from __future__ import annotations
+
 import cgitb
 import html as _html
 import json

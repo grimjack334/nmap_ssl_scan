@@ -12,6 +12,8 @@ Test locally (no web server needed):
     # then open http://localhost:8080/cgi-bin/ssl_certs.cgi
 """
 
+from __future__ import annotations
+
 import cgi
 import cgitb
 import html
