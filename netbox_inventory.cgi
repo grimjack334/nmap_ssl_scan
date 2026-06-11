@@ -486,7 +486,10 @@ def page_wrap(title: str, body: str) -> str:
     var card = el.closest('.chart-card');
     if(!card) return;
     var related = e.relatedTarget;
-    if(related && related.closest && related.closest('.chart-card') === card) return;
+    if(related && related.closest) {
+      var relEl = related.closest('path[data-label], .legend-item[data-label]');
+      if(relEl && relEl.closest('.chart-card') === card) return;
+    }
     highlight(card, null);
     tipHide();
   });
