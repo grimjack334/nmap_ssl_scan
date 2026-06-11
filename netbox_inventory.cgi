@@ -499,72 +499,12 @@ def page_wrap(title: str, body: str) -> str:
     if(tip.style.display === 'block') tipMove(e);
   });
 
-  document.addEventListener('mouseout', function(e){
-    var el = e.target.closest && e.target.closest('path[data-label], .legend-item[data-label]');
-    if(!el) return;
-    var card = el.closest('.chart-card');
-    if(!card) return;
-    var related = e.relatedTarget;
-    if(related && related.closest) {
-      var relEl = related.closest('path[data-label], .legend-item[data-label]');
-      if(relEl && relEl.closest('.chart-card') === card) return;
-    }
-    highlight(card, null);
-    tipHide();
-  });
-
-  // Export helpers
-  function extractTable(tableId, keyField){
-    var table = document.getElementById(tableId);
-    if(!table) return [];
-    return Array.from(table.querySelectorAll('tbody tr')).map(function(row){
-      var cells = row.querySelectorAll('td');
-      var obj = {};
-      obj[keyField]  = cells[0] ? cells[0].textContent.trim() : '';
-      obj['devices'] = cells[1] ? cells[1].textContent.trim().replace(/,/g,'') : '';
-      obj['vms']     = cells[2] ? cells[2].textContent.trim().replace(/,/g,'') : '';
-      obj['total']   = cells[3] ? cells[3].textContent.trim().replace(/,/g,'') : '';
-      return obj;
+  document.querySelectorAll('.chart-card').forEach(function(card){
+    card.addEventListener('mouseleave', function(){
+      highlight(card, null);
+      tipHide();
     });
-  }
-
-  function csvEsc(v){
-    if(v.indexOf(',') >= 0 || v.indexOf('"') >= 0 || v.indexOf('\n') >= 0)
-      return '"' + v.replace(/"/g, '""') + '"';
-    return v;
-  }
-
-  function download(content, filename, type){
-    var blob = new Blob([content], {type: type});
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href = url; a.download = filename; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function wireExport(csvId, jsonId, tableId, keyField, basename){
-    var csvBtn  = document.getElementById(csvId);
-    var jsonBtn = document.getElementById(jsonId);
-    if(csvBtn){
-      csvBtn.addEventListener('click', function(){
-        var data   = extractTable(tableId, keyField);
-        var header = [keyField,'devices','vms','total'].join(',') + '\n';
-        var lines  = data.map(function(o){
-          return [o[keyField],o.devices,o.vms,o.total].map(csvEsc).join(',');
-        });
-        download(header + lines.join('\n'), basename + '.csv', 'text/csv');
-      });
-    }
-    if(jsonBtn){
-      jsonBtn.addEventListener('click', function(){
-        download(JSON.stringify(extractTable(tableId, keyField), null, 2),
-                 basename + '.json', 'application/json');
-      });
-    }
-  }
-
-  wireExport('tenant-csv',  'tenant-json',  'tenant-table',  'tenant', 'netbox_tenants');
-  wireExport('domain-csv',  'domain-json',  'domain-table',  'domain', 'netbox_domains');
+  });
 })();
 """
     return (
@@ -696,12 +636,8 @@ def view_summary(rows: list, domain_rows: list, total_devices: int, total_vms: i
 
         table_html = f"""
     <div class="detail-card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <h3 style="margin:0">Breakdown by Tenant</h3>
-        <button id="tenant-csv"  class="btn secondary" style="font-size:.72rem;padding:3px 10px;margin-left:auto">CSV</button>
-        <button id="tenant-json" class="btn secondary" style="font-size:.72rem;padding:3px 10px">JSON</button>
-      </div>
-      <table id="tenant-table">
+      <h3>Breakdown by Tenant</h3>
+      <table>
         <thead>
           <tr>
             <th>Tenant</th>
@@ -753,12 +689,8 @@ def view_summary(rows: list, domain_rows: list, total_devices: int, total_vms: i
 
         domain_table_html = f"""
     <div class="detail-card" style="margin-top:16px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-        <h3 style="margin:0">Breakdown by Domain</h3>
-        <button id="domain-csv"  class="btn secondary" style="font-size:.72rem;padding:3px 10px;margin-left:auto">CSV</button>
-        <button id="domain-json" class="btn secondary" style="font-size:.72rem;padding:3px 10px">JSON</button>
-      </div>
-      <table id="domain-table">
+      <h3>Breakdown by Domain</h3>
+      <table>
         <thead>
           <tr>
             <th>Domain</th>
