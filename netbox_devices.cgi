@@ -436,6 +436,58 @@ def page_wrap(title: str, body: str) -> str:
   }
 
   updateCount();
+
+  // Export helpers
+  function visibleRows(){
+    return rows.filter(function(r){ return r.style.display !== 'none'; });
+  }
+
+  function rowToObj(row){
+    return {
+      name:   row.dataset.name   || '',
+      type:   row.dataset.kind   || '',
+      tenant: row.dataset.tenant || '',
+      domain: row.dataset.domain || '',
+      role:   row.dataset.role   || '',
+      status: row.dataset.status || '',
+      site:   row.dataset.site   || '',
+    };
+  }
+
+  function csvEsc(v){
+    if(v.indexOf(',') >= 0 || v.indexOf('"') >= 0 || v.indexOf('\n') >= 0)
+      return '"' + v.replace(/"/g, '""') + '"';
+    return v;
+  }
+
+  function download(content, filename, type){
+    var blob = new Blob([content], {type: type});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  var csvBtn  = document.getElementById('btn-csv');
+  var jsonBtn = document.getElementById('btn-json');
+
+  if(csvBtn){
+    csvBtn.addEventListener('click', function(){
+      var header = 'name,type,tenant,domain,role,status,site\n';
+      var lines  = visibleRows().map(function(row){
+        var o = rowToObj(row);
+        return [o.name,o.type,o.tenant,o.domain,o.role,o.status,o.site].map(csvEsc).join(',');
+      });
+      download(header + lines.join('\n'), 'netbox_devices.csv', 'text/csv');
+    });
+  }
+
+  if(jsonBtn){
+    jsonBtn.addEventListener('click', function(){
+      var data = visibleRows().map(rowToObj);
+      download(JSON.stringify(data, null, 2), 'netbox_devices.json', 'application/json');
+    });
+  }
 })();
 """
     return (
@@ -536,6 +588,8 @@ def view_list(items: list, source: str, error: str | None) -> str:
       <select id="f-tenant">{tenant_opts}</select>
       <select id="f-domain">{domain_opts}</select>
       <button id="f-reset" class="btn secondary">Reset</button>
+      <button id="btn-csv"  class="btn secondary">Export CSV</button>
+      <button id="btn-json" class="btn secondary">Export JSON</button>
       <span id="row-count" class="row-count"></span>
     </div>"""
 
