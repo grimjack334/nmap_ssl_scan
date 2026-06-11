@@ -118,6 +118,8 @@ NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_inventory.cgi
 
 Data source priority: `NETBOX_EXPORT_FILE` → live API (`NETBOX_URL` + `NETBOX_TOKEN`) → built-in example data. An info banner identifies which source is active. The sidebar links to `netbox_devices.cgi`.
 
+Displays a Domains stat card, an Inventory by Domain donut chart, and a Breakdown by Domain table alongside the tenant breakdown. Domain is read from the `domain` NetBox custom field on each device and VM.
+
 ### NetBox device list (`netbox_devices.cgi`)
 
 A sortable, filterable combined list of all devices and virtual machines from NetBox. Columns: Name, Type, Tenant, Role, Status, Site. All sorting and filtering is client-side with no page reloads.
@@ -135,7 +137,7 @@ NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_dev
 NETBOX_EXPORT_FILE=/path/to/netbox_export.json python3 netbox_devices.cgi
 ```
 
-Filter controls: free-text search across all columns, plus Type / Status / Tenant dropdowns populated from the live data. Click any column header to sort; click again to reverse. Data source priority is the same as `netbox_inventory.cgi`.
+Columns: Name, Type, Tenant, Domain, Role, Status, Site. Filter controls: free-text search across all columns, plus Type, Status, Tenant, and Domain dropdowns populated from the live data. Click any column header to sort; click again to reverse. Domain is read from the `domain` NetBox custom field. Data source priority is the same as `netbox_inventory.cgi`.
 
 ### NetBox export (`netbox_export.py`)
 
@@ -152,7 +154,7 @@ NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token python3 netbox_exp
 python3 netbox_export.py --url ... --token ... --output /var/www/cgi-bin/netbox_export.json --pretty
 ```
 
-The output file contains `exported_at` (ISO 8601 UTC timestamp), `source` (NetBox URL), `devices`, and `virtual_machines`. Each record is pruned to the fields the CGI scripts require.
+The output file contains `exported_at` (ISO 8601 UTC timestamp), `source` (NetBox URL), `devices`, and `virtual_machines`. Each record is pruned to the fields the CGI scripts require, including the `domain` NetBox custom field.
 
 ## Nagios NRPE plugin (`check_nfs_mounts.sh`)
 

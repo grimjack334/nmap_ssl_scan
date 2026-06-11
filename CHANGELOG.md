@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## [1.8.0] - 2026-06-11
+
+### Added
+- `domain` NetBox custom field support across all three NetBox scripts
+- `netbox_export.py`: exports `custom_fields.domain` from each device and VM
+- `netbox_devices.cgi`: sortable Domain column (between Tenant and Role) and All Domains filter dropdown
+- `netbox_inventory.cgi`: Domains stat card, Inventory by Domain donut chart, and Breakdown by Domain table
+
 ## [1.7.3] - 2026-06-11
 
 ### Fixed
