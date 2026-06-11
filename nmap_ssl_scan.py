@@ -13,6 +13,8 @@ Examples:
     python3 nmap_ssl_scan.py example.com --query
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
