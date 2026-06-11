@@ -120,8 +120,6 @@ Data source priority: `NETBOX_EXPORT_FILE` → live API (`NETBOX_URL` + `NETBOX_
 
 Displays a Domains stat card, an Inventory by Domain donut chart, and a Breakdown by Domain table alongside the tenant breakdown. Domain is read from the `domain` NetBox custom field on each device and VM.
 
-Each breakdown table has CSV and JSON export buttons. Tenant data downloads as `netbox_tenants.csv/.json`; domain data as `netbox_domains.csv/.json`. Exported fields: name, devices, VMs, total.
-
 ### NetBox device list (`netbox_devices.cgi`)
 
 A sortable, filterable combined list of all devices and virtual machines from NetBox. Columns: Name, Type, Tenant, Role, Status, Site. All sorting and filtering is client-side with no page reloads.

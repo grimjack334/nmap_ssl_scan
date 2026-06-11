@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## [1.8.3] - 2026-06-11
+
+### Fixed
+- `netbox_inventory.cgi`: chart tooltips now show and hide correctly — replaced `mouseout` delegation (which fired on internal SVG boundary crossings) with `mouseleave` on each `.chart-card` element
+
+### Removed
+- `netbox_inventory.cgi`: CSV and JSON export buttons removed from the Breakdown by Tenant and Breakdown by Domain tables
+
 ## [1.8.2] - 2026-06-11
 
 ### Added
