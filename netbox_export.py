@@ -12,6 +12,8 @@ Usage:
     python3 netbox_export.py --url ... --token ... --pretty
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os

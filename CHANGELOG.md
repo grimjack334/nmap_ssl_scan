@@ -5,7 +5,7 @@ All notable changes to this project will be documented here.
 ## [1.7.2] - 2026-06-11
 
 ### Fixed
-- Added `from __future__ import annotations` to `netbox_devices.cgi`, `netbox_inventory.cgi`, and `ssl_certs.cgi` to support Python 3.9; `str | None` and `tuple[T, ...]` union/generic hints previously caused `TypeError` on Python < 3.10
+- Added `from __future__ import annotations` to `netbox_devices.cgi`, `netbox_inventory.cgi`, `ssl_certs.cgi`, and `netbox_export.py` to support Python 3.9; `str | None` and `tuple[T, ...]` union/generic hints previously caused `TypeError` on Python < 3.10
 
 ### Changed
 - Minimum Python version lowered from 3.10 to 3.9
