@@ -105,6 +105,85 @@ Prefixes shared across multiple tags are counted once.
 | `--netbox-token TOKEN` | `NETBOX_TOKEN` | — |
 | `--netbox-tag TAG` (repeatable) | `NETBOX_TAG` (comma-separated) | `nmap_ssl_scan` |
 
+## Automation / cron
+
+### /etc/cron.d
+
+```cron
+# Scan NetBox-tagged prefixes nightly at 02:00
+0 2 * * * root NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token \
+    /usr/bin/python3 /opt/nmap_ssl_scan/nmap_ssl_scan.py \
+    --netbox-tag corp-infra \
+    --db /var/lib/nmap_ssl_scan/certs.db \
+    >> /var/log/nmap_ssl_scan.log 2>&1
+
+# Scan specific subnets weekly on Sunday at 03:30
+30 3 * * 0 root \
+    /usr/bin/python3 /opt/nmap_ssl_scan/nmap_ssl_scan.py \
+    10.0.0.0/8 172.16.0.0/12 \
+    -p 443,8443,4443 \
+    --db /var/lib/nmap_ssl_scan/certs.db \
+    >> /var/log/nmap_ssl_scan.log 2>&1
+```
+
+### User crontab (`crontab -e`)
+
+```cron
+# Nightly scan — multiple NetBox tags (OR)
+0 2 * * * NETBOX_URL=https://netbox.example.com NETBOX_TOKEN=your_token NETBOX_TAG=prod-web,prod-api \
+    python3 ~/nmap_ssl_scan/nmap_ssl_scan.py --db ~/nmap_ssl_scan/certs.db >> ~/nmap_ssl_scan/scan.log 2>&1
+
+# Export to JSON after each scan for the web UI
+5 2 * * * python3 ~/nmap_ssl_scan/nmap_ssl_scan.py --no-scan \
+    --db ~/nmap_ssl_scan/certs.db \
+    --export-json /var/www/cgi-bin/certs.json >> ~/nmap_ssl_scan/scan.log 2>&1
+```
+
+### systemd timer
+
+`/etc/systemd/system/nmap-ssl-scan.service`:
+```ini
+[Unit]
+Description=nmap SSL certificate scan
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=/etc/nmap_ssl_scan/env
+ExecStart=/usr/bin/python3 /opt/nmap_ssl_scan/nmap_ssl_scan.py \
+    --netbox-tag corp-infra \
+    --db /var/lib/nmap_ssl_scan/certs.db
+StandardOutput=append:/var/log/nmap_ssl_scan.log
+StandardError=append:/var/log/nmap_ssl_scan.log
+```
+
+`/etc/systemd/system/nmap-ssl-scan.timer`:
+```ini
+[Unit]
+Description=Run nmap SSL scan nightly
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+`/etc/nmap_ssl_scan/env` (mode 0600):
+```
+NETBOX_URL=https://netbox.example.com
+NETBOX_TOKEN=your_token
+```
+
+```bash
+systemctl daemon-reload
+systemctl enable --now nmap-ssl-scan.timer
+systemctl list-timers nmap-ssl-scan.timer
+```
+
 ## Querying results
 
 ```bash
