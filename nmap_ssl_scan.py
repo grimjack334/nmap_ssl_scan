@@ -23,6 +23,7 @@ import sqlite3
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -396,28 +397,46 @@ def export_json(conn: sqlite3.Connection, out_path: str):
 
 # ── NetBox ────────────────────────────────────────────────────────────────────
 
-def fetch_netbox_prefixes(base_url: str, token: str, tag: str = "nmap_ssl_scan") -> list[str]:
-    """Return all active prefixes from NetBox that carry the given tag."""
-    prefixes = []
-    url = f"{base_url.rstrip('/')}/api/ipam/prefixes/?tag={tag}&status=active&limit=1000"
+def fetch_netbox_prefixes(base_url: str, token: str,
+                          tags: list[str] | None = None) -> list[str]:
+    """Return active prefixes from NetBox tagged with any of the given tags.
 
-    while url:
-        req = urllib.request.Request(
-            url,
-            headers={"Authorization": f"Token {token}", "Accept": "application/json"},
+    Multiple tags use OR semantics: one API request is made per tag and the
+    results are merged and deduplicated by prefix CIDR.
+    """
+    if not tags:
+        tags = ["nmap_ssl_scan"]
+
+    headers = {"Authorization": f"Token {token}", "Accept": "application/json"}
+    seen:     set[str]  = set()
+    prefixes: list[str] = []
+
+    for tag in tags:
+        url: str | None = (
+            f"{base_url.rstrip('/')}/api/ipam/prefixes/"
+            f"?tag={urllib.parse.quote(tag)}&status=active&limit=1000"
         )
-        try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                data = json.loads(resp.read())
-        except urllib.error.HTTPError as e:
-            sys.exit(f"[!] NetBox API error {e.code}: {e.reason}")
-        except urllib.error.URLError as e:
-            sys.exit(f"[!] Could not reach NetBox at {base_url}: {e.reason}")
+        tag_count = 0
+        while url:
+            req = urllib.request.Request(url, headers=headers)
+            try:
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    data = json.loads(resp.read())
+            except urllib.error.HTTPError as e:
+                sys.exit(f"[!] NetBox API error {e.code}: {e.reason}")
+            except urllib.error.URLError as e:
+                sys.exit(f"[!] Could not reach NetBox at {base_url}: {e.reason}")
 
-        for result in data.get("results", []):
-            prefixes.append(result["prefix"])
+            for result in data.get("results", []):
+                cidr = result["prefix"]
+                if cidr not in seen:
+                    seen.add(cidr)
+                    prefixes.append(cidr)
+                    tag_count += 1
 
-        url = data.get("next")
+            url = data.get("next")
+
+        print(f"[*]   tag={tag!r}: {tag_count} prefix(es)")
 
     return prefixes
 
@@ -451,6 +470,10 @@ def main():
     parser.add_argument("--netbox-token",  metavar="TOKEN",
                         default=os.environ.get("NETBOX_TOKEN"),
                         help="NetBox API token (or set NETBOX_TOKEN env var)")
+    parser.add_argument("--netbox-tag",    metavar="TAG", action="append",
+                        dest="netbox_tags",
+                        default=os.environ.get("NETBOX_TAG", "").split(",") if os.environ.get("NETBOX_TAG") else None,
+                        help="NetBox prefix tag to scan (repeatable for OR; default: nmap_ssl_scan)")
     args = parser.parse_args()
 
     conn = get_db(args.db)
@@ -473,9 +496,11 @@ def main():
     if args.netbox_url:
         if not args.netbox_token:
             sys.exit("[!] --netbox-url requires a token via --netbox-token or NETBOX_TOKEN env var.")
-        nb_prefixes = fetch_netbox_prefixes(args.netbox_url, args.netbox_token)
+        tags = [t.strip() for t in (args.netbox_tags or []) if t.strip()] or ["nmap_ssl_scan"]
+        print(f"[*] Fetching prefixes from NetBox (tags: {', '.join(tags)})")
+        nb_prefixes = fetch_netbox_prefixes(args.netbox_url, args.netbox_token, tags)
         if not nb_prefixes:
-            sys.exit("[!] NetBox returned no prefixes tagged 'nmap_ssl_scan'.")
+            sys.exit(f"[!] NetBox returned no active prefixes for tag(s): {', '.join(tags)}")
         print(f"[*] Loaded {len(nb_prefixes)} prefix(es) from NetBox")
         targets.extend(nb_prefixes)
 
