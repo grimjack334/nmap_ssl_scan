@@ -48,22 +48,62 @@ Default ports: `443, 8443, 9443, 4443`
 
 ## NetBox integration
 
-Prefixes can be pulled automatically from NetBox instead of (or in addition to) specifying targets manually. Tag any prefixes in NetBox with `nmap_ssl_scan` and they will be included in the scan.
+Prefixes can be pulled automatically from NetBox instead of (or in addition to) specifying targets manually. Tag prefixes in NetBox and pass the tag name with `--netbox-tag` — only `active` prefixes carrying that tag are fetched.
 
 ```bash
-# Via environment variables (recommended)
+# Default tag (nmap_ssl_scan) via env vars
 export NETBOX_URL=https://netbox.example.com
 export NETBOX_TOKEN=your_token
 python3 nmap_ssl_scan.py
 
-# Via CLI flags
-python3 nmap_ssl_scan.py --netbox-url https://netbox.example.com --netbox-token your_token
+# Specify a custom tag
+python3 nmap_ssl_scan.py \
+    --netbox-url https://netbox.example.com \
+    --netbox-token your_token \
+    --netbox-tag corp-infra
+
+# Multiple tags — OR semantics (prefixes with any matching tag, deduplicated)
+python3 nmap_ssl_scan.py \
+    --netbox-url https://netbox.example.com \
+    --netbox-token your_token \
+    --netbox-tag prod-web \
+    --netbox-tag prod-api \
+    --netbox-tag dmz
 
 # Combined with manual targets
-python3 nmap_ssl_scan.py --netbox-url https://netbox.example.com extra-host.com
+python3 nmap_ssl_scan.py \
+    --netbox-url https://netbox.example.com \
+    --netbox-token your_token \
+    --netbox-tag corp-infra \
+    extra-host.example.com
 ```
 
-Only prefixes with status `active` and the `nmap_ssl_scan` tag are fetched.
+`NETBOX_TAG` env var is also accepted (comma-separated for multiple tags):
+
+```bash
+export NETBOX_URL=https://netbox.example.com
+export NETBOX_TOKEN=your_token
+export NETBOX_TAG=prod-web,prod-api
+python3 nmap_ssl_scan.py
+```
+
+The scanner prints a per-tag breakdown so you can see how many prefixes each tag contributed:
+
+```
+[*] Fetching prefixes from NetBox (tags: prod-web, prod-api, dmz)
+[*]   tag='prod-web': 12 prefix(es)
+[*]   tag='prod-api': 8 prefix(es)
+[*]   tag='dmz': 4 prefix(es)
+[*] Loaded 22 prefix(es) from NetBox
+```
+
+Prefixes shared across multiple tags are counted once.
+
+| Option | Env var | Default |
+|---|---|---|
+| `--netbox-url URL` | `NETBOX_URL` | — |
+| `--netbox-token TOKEN` | `NETBOX_TOKEN` | — |
+| `--netbox-tag TAG` (repeatable) | `NETBOX_TAG` (comma-separated) | `nmap_ssl_scan` |
 
 ## Querying results
 
